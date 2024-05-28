@@ -1,1 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>House Pricing</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        function updateForm() {
+            var model = document.getElementById("model").value;
+            var lgbFields = document.getElementsByClassName("lgb-field");
+            var rfFields = document.getElementsByClassName("rf-field");
+            if (model == "random_forest") {
+                for (var i = 0; i < lgbFields.length; i++) {
+                    lgbFields[i].style.display = "none";
+                }
+                for (var i = 0; i < rfFields.length; i++) {
+                    rfFields[i].style.display = "block";
+                }
+            } else if (model == "lightgbm") {
+                for (var i = 0; i < lgbFields.length; i++) {
+                    lgbFields[i].style.display = "block";
+                }
+                for (var i = 0; i < rfFields.length; i++) {
+                    rfFields[i].style.display = "none";
+                }
+            }
+        }
+        window.onload = updateForm;
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Previsão de Preço de Casas</h1>
+        {% if result %}
+        <div class="alert alert-info" role="alert">
+            <h3>Valor Estimado: {{ result }}$</h3>
+        </div>
+        <a href="/" class="btn btn-primary">Estimar Novamente</a>
+        {% endif %}
+        {% if result == None %}
+        <form action="/predict" method="POST">
+            <div class="form-group">
+                <label for="model">Escolha o Modelo:</label>
+                <select class="form-control" id="model" name="model" onchange="updateForm()">
+                    <option value="random_forest">Random Forest</option>
+                    <option value="lightgbm">LightGBM</option>
+                </select>
+            </div>
+
+            <div class="form-group rf-field">
+                <label>Latitude (47.19 - 47.78)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="latitude" placeholder="Ex: 47.6062" min="47.18996" max="47.77714" required>
+            </div>
+            <div class="form-group rf-field">
+                <label>Longitude (-122.51 - -121.47)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="longitude" placeholder="Ex: -122.3321" min="-122.514798" max="-121.472967" required>
+            </div>
+            <div class="form-group rf-field">
+                <label>Tamanho da Casa (410 - 10040 pés quadrados)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="size_house" placeholder="Ex: 2000" min="410" max="10040" required>
+            </div>
+            <div class="form-group rf-field">
+                <label>Média do Tamanho das Casas Vizinhas (780 - 5790 pés quadrados)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="avg_size_neighbor_houses" placeholder="Ex: 2500" min="780" max="5790" required>
+            </div>
+            <div class="form-group rf-field">
+                <label>Ano de Construção (1900 - 2015)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="year_built" placeholder="Ex: 1990" min="1900" max="2015" required>
+            </div>
+
+            <div class="form-group lgb-field">
+                <label>Latitude (47.19 - 47.78)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="latitude" placeholder="Ex: 47.6062" min="47.18996" max="47.77714" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>Longitude (-122.51 - -121.47)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="longitude" placeholder="Ex: -122.3321" min="-122.514798" max="-121.472967" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>Tamanho da Casa (410 - 10040 pés quadrados)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="size_house" placeholder="Ex: 2000" min="410" max="10040" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>Média do Tamanho das Casas Vizinhas (780 - 5790 pés quadrados)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="avg_size_neighbor_houses" placeholder="Ex: 2500" min="780" max="5790" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>Média do Tamanho dos Terrenos Vizinhos (659 - 392040 pés quadrados)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="avg_size_neighbor_lot" placeholder="Ex: 5000" min="659" max="392040" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>Tamanho do Terreno (649 - 1024068 pés quadrados)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="size_lot" placeholder="Ex: 5000" min="649" max="1024068" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>Ano de Construção (1900 - 2015)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="year_built" placeholder="Ex: 1990" min="1900" max="2015" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>Tamanho do Porão (0 - 4820 pés quadrados)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="size_basement" placeholder="Ex: 1000" min="0" max="4820" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>Quantidade de Banheiros (0 - 6.75)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="num_bath" placeholder="Ex: 2" min="0" max="6.75" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>Quantidade de Quartos (0 - 9)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="num_bed" placeholder="Ex: 3" min="0" max="9" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>Condição (1-5)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="condition" placeholder="Ex: 3" min="1" max="5" required>
+            </div>
+            <div class="form-group lgb-field">
+                <label>CEP (98001 - 98199)</label>
+                <input type="number" step="any" class="form-control form-control-sm" name="zip" placeholder="Ex: 98103" min="98001" max="98199" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Estimar</button>
+        </form>
+        {% endif %}
+    </div>
+</body>
+
+</html>
